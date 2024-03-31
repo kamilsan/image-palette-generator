@@ -1,0 +1,8 @@
+.vscode/
+[Bb]ild/
+Makefile
+bin/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+palette
