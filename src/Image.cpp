@@ -26,7 +26,7 @@ Image::Image(const std::string& filename) {
   pixels_ = std::make_unique<float[]>(len_);
 
   for (unsigned int i = 0; i < len_; ++i) {
-    pixels_[i] = Color::sRGBDecode(reinterpret_cast<unsigned char*>(data)[i] / 255.0f);
+    pixels_[i] = reinterpret_cast<unsigned char*>(data)[i] / 255.0f;
   }
 
   stbi_image_free(data);
@@ -92,8 +92,7 @@ bool Image::save(const std::string& filename) const {
   if (output_extension == ".png") {
     auto pixels_u8 = std::make_unique<unsigned char[]>(len_);
     for (unsigned int i = 0; i < len_; ++i) {
-      const float encoded = Color::sRGBEncode(pixels_[i]);
-      pixels_u8[i] = std::min(255.0f, std::max(0.0f, 255.0f * encoded + 0.5f));
+      pixels_u8[i] = std::min(255.0f, std::max(0.0f, 255.0f * pixels_[i] + 0.5f));
     }
 
     const auto stride = 3 * width_;

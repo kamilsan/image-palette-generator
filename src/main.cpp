@@ -19,6 +19,11 @@ int main(int argc, char** argv) {
   size_t num_iterations = 10;
   app.add_option("--iters", num_iterations, "Number of clustering iterations");
 
+  std::string color_space_name = "oklab";
+  app.add_option("--color_space", color_space_name,
+                 "Color space in which clustering will be performed. Available options are: "
+                 "linear_srgb, srgb, rgG, xyz, oklab (default)");
+
   size_t padding = 5;
   app.add_option("--padding", padding, "Padding between elements on output image");
 
@@ -39,6 +44,26 @@ int main(int argc, char** argv) {
 
   CLI11_PARSE(app, argc, argv);
 
+  ColorSpace working_color_space = ColorSpace::OKLAB;
+  std::transform(color_space_name.begin(), color_space_name.end(), color_space_name.begin(),
+                 [](unsigned char c) { return std::tolower(c); });
+
+  if (color_space_name == "linear_srgb") {
+    working_color_space = ColorSpace::sRGBLinear;
+  } else if (color_space_name == "srgb") {
+    working_color_space = ColorSpace::sRGB;
+  } else if (color_space_name == "rgg") {
+    working_color_space = ColorSpace::rgG;
+  } else if (color_space_name == "xyz") {
+    working_color_space = ColorSpace::XYZ;
+  } else if (color_space_name == "oklab") {
+    working_color_space = ColorSpace::OKLAB;
+  } else {
+    std::cerr << "ERROR: Unrecognized color space (" << color_space_name
+              << ")! Use one of the following: linear_srgb, srgb, rgg, xyz, oklab" << std::endl;
+    return 1;
+  }
+
   RNG rng{seed};
 
   if (random) {
@@ -46,7 +71,7 @@ int main(int argc, char** argv) {
   }
 
   Image image{input_image_path};
-  KMeansClustering clustering{rng, image, num_clusters, !dont_skip_black};
+  KMeansClustering clustering{rng, image, num_clusters, working_color_space, !dont_skip_black};
 
   std::cout << "Clustering...\n";
   clustering.run(num_iterations);
@@ -61,7 +86,7 @@ int main(int argc, char** argv) {
   const int palette_image_height = image.getHeight() + swatch_height + 3 * padding;
 
   Image palette_image(palette_image_width, palette_image_height);
-  palette_image.clear(Color{255, 255, 255});
+  palette_image.clear(Color{1.0f, 1.0f, 1.0f});
 
   palette_image.drawImage(image, padding, padding);
 
@@ -72,10 +97,10 @@ int main(int argc, char** argv) {
     const int swatch_x = std::ceil(padding + cluster_idx * (swatch_width + padding));
     const int swatch_y = 2 * padding + image.getHeight();
 
-    const auto& swatch_color = clusters[cluster_idx];
+    const auto swatch_color = clusters[cluster_idx].convertTo(ColorSpace::sRGB);
 
     palette_image.drawRectangle(swatch_color, swatch_x, swatch_y, swatch_width, swatch_height);
-    std::cout << Color::linearTosRGB(swatch_color) << "\n";
+    std::cout << swatch_color << std::endl;
   }
 
   if (!palette_image.save(output_file_name)) {

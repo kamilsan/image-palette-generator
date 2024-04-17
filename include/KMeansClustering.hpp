@@ -10,7 +10,8 @@
 
 class KMeansClustering {
  public:
-  KMeansClustering(RNG& rng, const Image& image, const size_t num_clusters, const bool skip_black);
+  KMeansClustering(RNG& rng, const Image& image, const size_t num_clusters,
+                   const ColorSpace color_space, const bool skip_black);
 
   void run(const size_t num_iterations);
 

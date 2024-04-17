@@ -5,7 +5,7 @@
 #include <limits>
 
 KMeansClustering::KMeansClustering(RNG& rng, const Image& image, const size_t num_clusters,
-                                   const bool skip_black)
+                                   const ColorSpace color_space, const bool skip_black)
     : colors_(), rng_(rng) {
   for (unsigned int y = 0; y < image.getHeight(); ++y) {
     for (unsigned int x = 0; x < image.getWidth(); ++x) {
@@ -17,7 +17,7 @@ KMeansClustering::KMeansClustering(RNG& rng, const Image& image, const size_t nu
         }
       }
 
-      colors_.emplace_back(color);
+      colors_.emplace_back(color.convertTo(color_space));
     }
   }
 
@@ -57,7 +57,7 @@ void KMeansClustering::assign_colors_to_clusters() {
 
 void KMeansClustering::recalculate_cluster_positions() {
   for (size_t cluster_idx = 0; cluster_idx < clusters_.size(); ++cluster_idx) {
-    Color new_cluster{};
+    Color new_cluster{clusters_[cluster_idx].getColorSpace()};
     size_t colors_in_cluster = 0;
 
     for (size_t color_idx = 0; color_idx < colors_.size(); ++color_idx) {
