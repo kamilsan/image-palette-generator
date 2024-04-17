@@ -19,6 +19,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <optional>
 #include <stdexcept>
 
 enum class ColorSpace { sRGB, sRGBLinear, rgG, XYZ, OKLAB };
@@ -35,6 +36,37 @@ struct Color {
       return convertLinearTo(color_space);
     } else {
       return toLinearsRGB().convertLinearTo(color_space);
+    }
+  }
+
+  static std::optional<Color> parse_string(const std::string& str) {
+    const auto first_comma = str.find(',');
+
+    if (first_comma == str.npos) {
+      return {};
+    }
+
+    auto second_comma = str.find(',', first_comma + 1);
+    if (second_comma == str.npos) {
+      return {};
+    }
+
+    const auto r_str = trim_string(str.substr(0, first_comma));
+    const auto g_str = trim_string(str.substr(first_comma + 1, second_comma - first_comma - 1));
+    const auto b_str = trim_string(str.substr(second_comma + 1));
+
+    try {
+      const int r = std::stoi(r_str);
+      const int g = std::stoi(g_str);
+      const int b = std::stoi(b_str);
+
+      if (r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255) {
+        return {};
+      }
+
+      return Color{r / 255.0f, g / 255.0f, b / 255.0f};
+    } catch (std::exception&) {
+      return {};
     }
   }
 
@@ -101,6 +133,20 @@ struct Color {
 
  private:
   ColorSpace color_space_;
+
+  static std::string trim_string(const std::string& str) {
+    size_t start_idx = 0;
+    while (start_idx < str.size() && str[start_idx] == ' ') {
+      start_idx += 1;
+    }
+
+    size_t end_idx = str.size() - 1;
+    while (end_idx > 0 && str[end_idx] == ' ') {
+      end_idx -= 1;
+    }
+
+    return str.substr(start_idx, end_idx - start_idx + 1);
+  }
 
   Color convertLinearTo(ColorSpace color_space) const {
     switch (color_space) {

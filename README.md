@@ -23,6 +23,7 @@ Options:
   --iters UINT                Number of clustering iterations
   --color_space TEXT          Color space in which clustering will be performed. Available options are: linear_srgb, srgb, rgG, xyz, oklab (default)
   --padding UINT              Padding between elements on output image
+  --bg TEXT                   Background color for generated visualization. Format: "r, g, b"
   --seed UINT                 Seed for random number generator
   --random                    Use random device to seed random number generator (seed parameter will be ignored)
   --dont_skip_black           Will include black pixels in clustering when set to true

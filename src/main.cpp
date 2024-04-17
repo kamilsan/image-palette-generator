@@ -27,6 +27,10 @@ int main(int argc, char** argv) {
   size_t padding = 5;
   app.add_option("--padding", padding, "Padding between elements on output image");
 
+  std::string background_color_str = "0, 0, 0";
+  app.add_option("--bg", background_color_str,
+                 "Background color for generated visualization. Format: \"r, g, b\"");
+
   size_t seed = 42;
   app.add_option("--seed", seed, "Seed for random number generator");
 
@@ -64,6 +68,15 @@ int main(int argc, char** argv) {
     return 1;
   }
 
+  const auto bg_color_opt = Color::parse_string(background_color_str);
+
+  if (!bg_color_opt.has_value()) {
+    std::cerr << "ERROR: Could not parse color: \"" << background_color_str << "\n" << std::endl;
+    return 1;
+  }
+
+  const auto bg_color = bg_color_opt.value();
+
   RNG rng{seed};
 
   if (random) {
@@ -86,7 +99,7 @@ int main(int argc, char** argv) {
   const int palette_image_height = image.getHeight() + swatch_height + 3 * padding;
 
   Image palette_image(palette_image_width, palette_image_height);
-  palette_image.clear(Color{1.0f, 1.0f, 1.0f});
+  palette_image.clear(bg_color);
 
   palette_image.drawImage(image, padding, padding);
 
