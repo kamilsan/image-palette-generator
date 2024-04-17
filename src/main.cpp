@@ -108,11 +108,17 @@ int main(int argc, char** argv) {
 
   for (size_t cluster_idx = 0; cluster_idx < clusters.size(); ++cluster_idx) {
     const int swatch_x = std::ceil(padding + cluster_idx * (swatch_width + padding));
+    const int swatch_x2 =
+        std::min((int)std::ceil(padding + (cluster_idx + 1) * (swatch_width + padding)),
+                 palette_image_width - 1);
+
+    const auto adjusted_width = swatch_x2 - swatch_x;
+
     const int swatch_y = 2 * padding + image.getHeight();
 
     const auto swatch_color = clusters[cluster_idx].convertTo(ColorSpace::sRGB);
 
-    palette_image.drawRectangle(swatch_color, swatch_x, swatch_y, swatch_width, swatch_height);
+    palette_image.drawRectangle(swatch_color, swatch_x, swatch_y, adjusted_width, swatch_height);
     std::cout << swatch_color << std::endl;
   }
 
