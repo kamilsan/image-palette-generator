@@ -39,6 +39,9 @@ int main(int argc, char** argv) {
       "--random", random,
       "Use random device to seed random number generator (seed parameter will be ignored)");
 
+  bool sort_colors = false;
+  app.add_flag("--sort_colors", sort_colors, "Sort colors in generated palette");
+
   bool dont_skip_black = false;
   app.add_flag("--dont_skip_black", dont_skip_black,
                "Will include black pixels in clustering when set to true");
@@ -104,7 +107,19 @@ int main(int argc, char** argv) {
   palette_image.drawImage(image, padding, padding);
 
   std::cout << "Clusters:\n";
-  const auto& clusters = clustering.get_clusters();
+  auto clusters = clustering.get_clusters();
+
+  if (sort_colors) {
+    std::sort(clusters.begin(), clusters.end(), [](const Color& color1, const Color& color2) {
+      const auto c1_oklab = color1.convertTo(ColorSpace::OKLAB);
+      const auto c2_oklab = color2.convertTo(ColorSpace::OKLAB);
+
+      const auto h1 = 0.5f + 0.5f * atan2f(-c1_oklab.g, -c1_oklab.b) / 3.14159265358979323846f;
+      const auto h2 = 0.5f + 0.5f * atan2f(-c2_oklab.g, -c2_oklab.b) / 3.14159265358979323846f;
+
+      return std::less<float>()(h1, h2);
+    });
+  }
 
   for (size_t cluster_idx = 0; cluster_idx < clusters.size(); ++cluster_idx) {
     const int swatch_x = std::ceil(padding + cluster_idx * (swatch_width + padding));

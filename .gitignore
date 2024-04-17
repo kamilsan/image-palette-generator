@@ -6,3 +6,4 @@ CMakeFiles/
 CMakeCache.txt
 cmake_install.cmake
 palette
+generate_results.sh

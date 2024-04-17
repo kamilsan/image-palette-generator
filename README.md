@@ -7,7 +7,7 @@ Generating image palette using K-means clustering in color space. User provided 
 ```console
 $ cmake .
 $ make -j8
-$ ./palette -i images/im1.png --iters 50 -n 16
+$ ./palette -i images/im1.png --iters 50 -n 25 --padding 0 --sort_colors -o palette1.png
 ```
 
 ## Usage
@@ -26,6 +26,7 @@ Options:
   --bg TEXT                   Background color for generated visualization. Format: "r, g, b"
   --seed UINT                 Seed for random number generator
   --random                    Use random device to seed random number generator (seed parameter will be ignored)
+  --sort_colors               Sort colors in generated palette
   --dont_skip_black           Will include black pixels in clustering when set to true
   -o,--output TEXT            Output image
 ```
