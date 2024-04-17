@@ -10,6 +10,14 @@ $ make -j8
 $ ./palette -i images/im1.png --iters 50 -n 25 --padding 0 --sort_colors -o palette1.png
 ```
 
+or on Windows:
+
+```console
+$ cmake -B build .
+$ cmake --build build --config Release
+$ ./build/Release/palette.exe -i images/im1.png --iters 50 -n 25 --padding 0 --sort_colors -o palette1.png
+```
+
 ## Usage
 
 ```

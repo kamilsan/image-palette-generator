@@ -21,6 +21,7 @@
 #include <iostream>
 #include <optional>
 #include <stdexcept>
+#include <string>
 
 enum class ColorSpace { sRGB, sRGBLinear, rgG, XYZ, OKLAB };
 
