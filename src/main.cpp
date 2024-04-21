@@ -127,7 +127,7 @@ int main(int argc, char** argv) {
         std::min((int)std::ceil(padding + (cluster_idx + 1) * (swatch_width + padding)),
                  palette_image_width - 1);
 
-    const auto adjusted_width = swatch_x2 - swatch_x;
+    const auto adjusted_width = swatch_x2 - swatch_x - padding;
 
     const int swatch_y = 2 * padding + image.getHeight();
 
